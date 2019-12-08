@@ -1,0 +1,35 @@
+# Blender MTL File: 'untitled.blend'
+# Material Count: 3
+
+newmtl C__Documents_and_.000_player_eye.0.png
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd models\Textures\player_eye.0.png
+
+newmtl C__Documents_and_.001_player_body.0.png
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd models\Textures\player_body.0.png
+
+newmtl C__Documents_and_Sett_player_head.0.png
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd models\Textures\player_head.0.png
