@@ -54,7 +54,12 @@ glm::vec3 eyePoint(   0.0f, 0.0f, 0.0f );
 glm::vec3 lookAtPoint( 0.0f,  0.0f,  0.0f );
 glm::vec3 upVector(    0.0f,  1.0f,  0.0f );
 
+bool freeCamOn = false;
 
+glm::vec2 freeCamAngles( -1.57f, 2.01f);
+glm::vec3 freeCamPos(   0.0f, 0.0f, 0.0f );
+glm::vec3 freeCamDir( 0.0f,  0.0f,  0.0f );
+glm::vec3 freeCamLookAt( 0.0f,  0.0f,  0.0f );
 
 string mansionStr = "models/Luigis_Mansion.obj";
 string skyboxStr = "models/Skybox.obj";
@@ -113,18 +118,43 @@ glm::vec4 black(0,0,0,1);
 //
 // Helper Functions
 
-// convertSphericalToCartesian() ///////////////////////////////////////////////
+// updateCamera() ///////////////////////////////////////////////
 //
 // This function updates the camera's position in cartesian coordinates based
 //  on its position in spherical coordinates. Should be called every time
 //  cameraAngles is updated.
 //
 ////////////////////////////////////////////////////////////////////////////////
-void convertSphericalToCartesian() {
-	eyePoint.x = cameraAngles.z * sinf( cameraAngles.x ) * sinf( cameraAngles.y );
-	eyePoint.y = cameraAngles.z * -cosf( cameraAngles.y );
-	eyePoint.z = cameraAngles.z * -cosf( cameraAngles.x ) * sinf( cameraAngles.y );
+void updateCamera() {
+	if(freeCamOn){
+		float r = sinf(freeCamAngles.y);
+		freeCamDir = glm::vec3(1*r*sinf(freeCamAngles.x), -1*cosf(freeCamAngles.y), -1*r*cosf(freeCamAngles.x));
+
+		freeCamDir = normalize(freeCamDir);
+		freeCamLookAt = freeCamPos+freeCamDir;
+	}else{
+		eyePoint.x = cameraAngles.z * sinf( cameraAngles.x ) * sinf( cameraAngles.y );
+		eyePoint.y = cameraAngles.z * -cosf( cameraAngles.y );
+		eyePoint.z = cameraAngles.z * -cosf( cameraAngles.x ) * sinf( cameraAngles.y );
+	}
 }
+
+void updateFreeCamera(){
+	if(moveUp){
+		freeCamPos += normalize(freeCamDir)*2.0f;
+	}
+	if(moveDown){
+		freeCamPos -= normalize(freeCamDir)*2.0f;
+	}
+	if(moveRight){
+		//freeCamPos += normalize(cross(normalize(freeCamDir), upVector))*2.0f;
+	}
+	if(moveLeft){
+		//freeCamPos -= normalize(cross(normalize(freeCamDir), upVector))*2.0f;
+	}
+	updateCamera();
+}
+
 
 bool registerOpenGLTexture(unsigned char *textureData,
                            unsigned int texWidth, unsigned int texHeight,
@@ -171,6 +201,13 @@ static void error_callback(int error, const char* description) {
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if( (key == GLFW_KEY_ESCAPE || key == 'Q') && action == GLFW_PRESS )
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+	if( (key == '1') && action == GLFW_PRESS ){
+		freeCamOn = ! freeCamOn;
+		moveUp = moveDown = moveRight = moveLeft = false;
+		updateCamera();
+	}
+		
 
 	if( action == GLFW_PRESS) {
 		switch( key ) {
@@ -248,20 +285,31 @@ static void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
 					mousePosition.x = xpos;
 					mousePosition.y = ypos;
 				} else {
-					if( !controlDown ) {
-						cameraAngles.x += (xpos - mousePosition.x)*0.005f;
-						cameraAngles.y += (ypos - mousePosition.y)*0.005f;
 
-						if( cameraAngles.y < 0 ) cameraAngles.y = 0.0f + 0.001f;
-						if( cameraAngles.y >= M_PI ) cameraAngles.y = M_PI - 0.001f;
-					} else {
-						double totChgSq = (xpos - mousePosition.x) + (ypos - mousePosition.y);
-						cameraAngles.z += totChgSq*0.02f;
+					if(freeCamOn){
+						freeCamAngles.x += (xpos - mousePosition.x)*0.005f;
+						freeCamAngles.y -= (ypos - mousePosition.y)*0.005f;
 
-						if( cameraAngles.z <= 2.0f ) cameraAngles.z = 2.0f;
-						if( cameraAngles.z >= 500.0f ) cameraAngles.z = 500.0f;
+						if( freeCamAngles.y < 0 ) freeCamAngles.y = 0.0f + 0.001f;
+						if( freeCamAngles.y >= M_PI ) freeCamAngles.y = M_PI - 0.001f;
+					}else{
+						if( !controlDown ) {
+							cameraAngles.x += (xpos - mousePosition.x)*0.005f;
+							cameraAngles.y += (ypos - mousePosition.y)*0.005f;
+
+							if( cameraAngles.y < 0 ) cameraAngles.y = 0.0f + 0.001f;
+							if( cameraAngles.y >= M_PI ) cameraAngles.y = M_PI - 0.001f;
+						} else {
+							double totChgSq = (xpos - mousePosition.x) + (ypos - mousePosition.y);
+							cameraAngles.z += totChgSq*0.02f;
+
+							if( cameraAngles.z <= 2.0f ) cameraAngles.z = 2.0f;
+							if( cameraAngles.z >= 500.0f ) cameraAngles.z = 500.0f;
+						}
 					}
-					convertSphericalToCartesian();
+
+					
+					updateCamera();
 
 					mousePosition.x = xpos;
 					mousePosition.y = ypos;
@@ -289,7 +337,7 @@ static void scroll_callback(GLFWwindow* window, double xOffset, double yOffset )
 	if( cameraAngles.z <= 2.0f ) cameraAngles.z = 2.0f;
 	if( cameraAngles.z >= 500.0f ) cameraAngles.z = 500.0f;
 
-	convertSphericalToCartesian();
+	updateCamera();
 }
 
 //******************************************************************************
@@ -651,7 +699,7 @@ int main( int argc, char *argv[] ) {
 	setupTextures();									// load all textures into memory
 	populateEnemies();								// generate enemies
 
-	convertSphericalToCartesian();		// set up our camera position
+	updateCamera();		// set up our camera position
 
 	CSCI441::setVertexAttributeLocations( textureShaderAttributes.vPos, -1, textureShaderAttributes.vTextureCoord );
 	CSCI441::drawSolidSphere( 1, 16, 16 );	// strange hack I need to make spheres draw - don't have time to investigate why..it's a bug with my library
@@ -680,6 +728,10 @@ int main( int argc, char *argv[] ) {
 
 		// set up our look at matrix to position our camera
 		glm::mat4 viewMatrix = glm::lookAt( eyePoint,lookAtPoint, upVector );
+
+		if(freeCamOn){
+			viewMatrix = glm::lookAt( freeCamPos, freeCamLookAt, upVector );
+		}
 		if(!playerAlive){
 			//death cam
 			viewMatrix = glm::lookAt( glm::vec3(playerLoc.x*1.1, 3.0f, playerLoc.z*1.1), glm::vec3(playerLoc.x, -3.0f, playerLoc.z), upVector );
@@ -713,6 +765,7 @@ int main( int argc, char *argv[] ) {
 			cout<<"\n\n\nHey, you won, good job!"<<endl;
 			completionMessagePrinted = true;
 		}*/
+		updateFreeCamera();
 		
 	}
 
