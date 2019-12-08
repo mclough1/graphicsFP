@@ -31,6 +31,7 @@
 
 #include <vector>					// for vector
 
+#include <CSCI441/modelLoader3.hpp> // to load in OBJ models
 #include <CSCI441/objects3.hpp>
 #include <CSCI441/ShaderProgram3.hpp>
 #include <CSCI441/TextureUtils.hpp>
@@ -60,6 +61,14 @@ GLuint brickTexHandle;
 const unsigned int NUM_WALLS = 6;
 GLuint skyboxVAOds[NUM_WALLS];						// all of our skybox VAOs
 GLuint skyboxHandles[NUM_WALLS];                    // all of our skybox handles
+
+string mansionStr = "models/Luigis_Mansion.obj";
+string skyboxStr = "models/Skybox.obj";
+
+const char* mansionModelfile = mansionStr.c_str();
+const char* skyboxModelfile = skyboxStr.c_str();
+CSCI441::ModelLoader* mansionModel = NULL;
+CSCI441::ModelLoader* skyboxModel = NULL;
 
 //two shaders, one texture shader for the platform and skybox, and a custom one for everything else
 CSCI441::ShaderProgram* textureShaderProgram = NULL;
@@ -253,10 +262,10 @@ static void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
 						if( cameraAngles.y >= M_PI ) cameraAngles.y = M_PI - 0.001f;
 					} else {
 						double totChgSq = (xpos - mousePosition.x) + (ypos - mousePosition.y);
-						cameraAngles.z += totChgSq*0.01f;
+						cameraAngles.z += totChgSq*0.02f;
 
 						if( cameraAngles.z <= 2.0f ) cameraAngles.z = 2.0f;
-						if( cameraAngles.z >= 40.0f ) cameraAngles.z = 40.0f;
+						if( cameraAngles.z >= 500.0f ) cameraAngles.z = 500.0f;
 					}
 					convertSphericalToCartesian();
 
@@ -284,7 +293,7 @@ static void scroll_callback(GLFWwindow* window, double xOffset, double yOffset )
 	cameraAngles.z += totChgSq*0.2f;
 
 	if( cameraAngles.z <= 2.0f ) cameraAngles.z = 2.0f;
-	if( cameraAngles.z >= 40.0f ) cameraAngles.z = 40.0f;
+	if( cameraAngles.z >= 500.0f ) cameraAngles.z = 500.0f;
 
 	convertSphericalToCartesian();
 }
@@ -437,6 +446,22 @@ void setupShaders() {
 //
 ////////////////////////////////////////////////////////////////////////////////
 void setupBuffers() {
+
+	///////////////////////////////////////////
+	//
+	// Models
+
+	mansionModel = new CSCI441::ModelLoader();
+	//model->enableAutoGenerateNormals();
+  	mansionModel->loadModelFile( mansionModelfile );
+	skyboxModel = new CSCI441::ModelLoader();
+	//model->enableAutoGenerateNormals();
+  	skyboxModel->loadModelFile( skyboxModelfile );
+
+
+
+
+
 	struct VertexTextured {
 		float x, y, z;
 		float s, t;
@@ -641,6 +666,13 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 
 	glm::mat4 playerMtx = glm::translate( modelMatrix, playerLoc );
 	drawHero(playerMtx);
+
+
+	textureShaderProgram->useProgram();
+	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &modelMatrix[0][0]);
+	glUniformMatrix4fv(textureShaderUniforms.viewProjectionMtx, 1, GL_FALSE, &vp[0][0]);
+	mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	skyboxModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	
 }
 
@@ -837,7 +869,7 @@ int main( int argc, char *argv[] ) {
 		// set the projection matrix based on the window size
 		// use a perspective projection that ranges
 		// with a FOV of 45 degrees, for our current aspect ratio, and Z ranges from [0.001, 1000].
-		glm::mat4 projectionMatrix = glm::perspective( 45.0f, windowWidth / (float) windowHeight, 0.001f, 100.0f );
+		glm::mat4 projectionMatrix = glm::perspective( 45.0f, windowWidth / (float) windowHeight, 0.001f, 1000.0f );
 
 		// set up our look at matrix to position our camera
 		glm::mat4 viewMatrix = glm::lookAt( eyePoint,lookAtPoint, upVector );
@@ -854,7 +886,7 @@ int main( int argc, char *argv[] ) {
 		glfwSwapBuffers(window);// flush the OpenGL commands and make sure they get rendered!
 		glfwPollEvents();				// check for any events and signal to redraw screen
 
-		// while the player is alive, move the enemies
+		/*// while the player is alive, move the enemies
 		if(playerAlive){
 			moveEnemies();
 			enemiesFallOff();
@@ -864,7 +896,7 @@ int main( int argc, char *argv[] ) {
 		// while the game is still playing, the player can move the character
 		if(!playerWon){
 			updatePlayer();
-		}
+		}*/
 
 		//ones an outcome of the game has happened, only one message is displayed accordingly
 		if(!playerAlive&&!completionMessagePrinted){
