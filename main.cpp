@@ -54,13 +54,7 @@ glm::vec3 eyePoint(   0.0f, 0.0f, 0.0f );
 glm::vec3 lookAtPoint( 0.0f,  0.0f,  0.0f );
 glm::vec3 upVector(    0.0f,  1.0f,  0.0f );
 
-GLuint platformVAOd;
-GLuint platformTextureHandle;
-GLuint brickTexHandle;
 
-const unsigned int NUM_WALLS = 6;
-GLuint skyboxVAOds[NUM_WALLS];						// all of our skybox VAOs
-GLuint skyboxHandles[NUM_WALLS];                    // all of our skybox handles
 
 string mansionStr = "models/Luigis_Mansion.obj";
 string skyboxStr = "models/Skybox.obj";
@@ -395,23 +389,7 @@ void setupGLEW() {
 //
 ////////////////////////////////////////////////////////////////////////////////
 void setupTextures() {
-	platformTextureHandle = CSCI441::TextureUtils::loadAndRegisterTexture( "textures/snow.jpg" );
-
-	// and get handles for our full skybox
-	printf( "[INFO]: registering skybox...\n" );
-	skyboxHandles[0] = CSCI441::TextureUtils::loadAndRegisterTexture( "textures/skybox/back.png"   );
-	skyboxHandles[1] = CSCI441::TextureUtils::loadAndRegisterTexture( "textures/skybox/left.png"   );
-	skyboxHandles[2] = CSCI441::TextureUtils::loadAndRegisterTexture( "textures/skybox/front.png"  );
-	skyboxHandles[3] = CSCI441::TextureUtils::loadAndRegisterTexture( "textures/skybox/right.png"  );
-	skyboxHandles[4] = CSCI441::TextureUtils::loadAndRegisterTexture( "textures/skybox/bottom.png" );
-	skyboxHandles[5] = CSCI441::TextureUtils::loadAndRegisterTexture( "textures/skybox/top.png"    );
-	printf( "[INFO]: ...skybox textures read in and registered!\n\n" );
-
-	unsigned char *brickTexData;
-	int brickTexWidth, brickTexHeight;
-	CSCI441::TextureUtils::loadPPM("textures/brick.ppm", brickTexWidth, brickTexHeight, brickTexData);
-	registerOpenGLTexture(brickTexData, brickTexWidth, brickTexHeight, brickTexHandle);
-	printf( "[INFO]: brick texture read in and registered\n" );
+	
 }
 
 void setupShaders() {
@@ -461,117 +439,6 @@ void setupBuffers() {
 
 
 
-
-	struct VertexTextured {
-		float x, y, z;
-		float s, t;
-	};
-
-	//////////////////////////////////////////
-	//
-	// PLATFORM
-
-	GLfloat platformSize = GROUND_SIZE;
-
-	VertexTextured platformVertices[4] = {
-			{ -platformSize, 0.0f, -platformSize,   0.0f,  0.0f }, // 0 - BL
-			{  platformSize, 0.0f, -platformSize,   1.0f,  0.0f }, // 1 - BR
-			{ -platformSize, 0.0f,  platformSize,   0.0f,  1.0f }, // 2 - TL
-			{  platformSize, 0.0f,  platformSize,   1.0f,  1.0f }  // 3 - TR
-	};
-
-	unsigned short platformIndices[4] = { 0, 1, 2, 3 };
-
-	glGenVertexArrays( 1, &platformVAOd );
-	glBindVertexArray( platformVAOd );
-
-	GLuint vbods[2];
-	glGenBuffers( 2, vbods );
-
-	glBindBuffer( GL_ARRAY_BUFFER, vbods[0] );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( platformVertices ), platformVertices, GL_STATIC_DRAW );
-
-	glEnableVertexAttribArray( textureShaderAttributes.vPos );
-	glVertexAttribPointer( textureShaderAttributes.vPos, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTextured), (void*) 0 );
-
-	glEnableVertexAttribArray( textureShaderAttributes.vTextureCoord );
-	glVertexAttribPointer( textureShaderAttributes.vTextureCoord, 2, GL_FLOAT, GL_FALSE, sizeof(VertexTextured), (void*) (sizeof(float) * 3) );
-
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbods[1] );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( platformIndices ), platformIndices, GL_STATIC_DRAW );
-
-	//////////////////////////////////////////
-	//
-	// SKYBOX
-
-	VertexTextured skyboxVerts[NUM_WALLS][4] = {
-		// back
-		{
-			{ -40.0f, -40.0f, -40.0f,   0.0f,   0.0f }, // 0 - BL
-			{ -40.0f, -40.0f,  40.0f,  -1.0f,   0.0f }, // 1 - BR
-			{ -40.0f,  40.0f, -40.0f,   0.0f,   1.0f }, // 2 - TL
-			{ -40.0f,  40.0f,  40.0f,  -1.0f,   1.0f }  // 3 - TR
-		},
-		
-		// right
-		{
-			{ -40.0f, -40.0f,  40.0f,   0.0f,   0.0f }, // 0 - BL
-			{  40.0f, -40.0f,  40.0f,  -1.0f,   0.0f }, // 1 - BR
-			{ -40.0f,  40.0f,  40.0f,   0.0f,   1.0f }, // 2 - TL
-			{  40.0f,  40.0f,  40.0f,  -1.0f,   1.0f }  // 3 - TR
-		},
-		
-		// front
-		{
-			{  40.0f, -40.0f, -40.0f,   0.0f,   0.0f }, // 0 - BL
-			{  40.0f, -40.0f,  40.0f,   1.0f,   0.0f }, // 1 - BR
-			{  40.0f,  40.0f, -40.0f,   0.0f,   1.0f }, // 2 - TL
-			{  40.0f,  40.0f,  40.0f,   1.0f,   1.0f }  // 3 - TR
-		},
-		
-		// left
-		{
-			{ -40.0f, -40.0f, -40.0f,   0.0f,   0.0f }, // 0 - BL
-			{  40.0f, -40.0f, -40.0f,   1.0f,   0.0f }, // 1 - BR
-			{ -40.0f,  40.0f, -40.0f,   0.0f,   1.0f }, // 2 - TL
-			{  40.0f,  40.0f, -40.0f,   1.0f,   1.0f }  // 3 - TR
-		},
-		
-		// ground
-		{
-			{ -40.0f, -40.0f, -40.0f,   1.0f,   1.0f }, // 0 - BL
-			{  40.0f, -40.0f, -40.0f,   1.0f,   0.0f }, // 1 - BR
-			{ -40.0f, -40.0f,  40.0f,   0.0f,   1.0f }, // 2 - TL
-			{  40.0f, -40.0f,  40.0f,   0.0f,   0.0f }  // 3 - TR
-		},
-		
-		// top
-		{
-			{ -40.0f,  40.0f, -40.0f,   1.0f,  -1.0f }, // 0 - BL
-			{  40.0f,  40.0f, -40.0f,   1.0f,   0.0f }, // 1 - BR
-			{ -40.0f,  40.0f,  40.0f,   0.0f,  -1.0f }, // 2 - TL
-			{  40.0f,  40.0f,  40.0f,   0.0f,   0.0f }  // 3 - TR
-		}
-	};
-	
-	unsigned short skyBoxIndices[4] = {
-		0, 1, 2, 3
-	};
-	
-	glGenVertexArrays( 6, skyboxVAOds );
-
-	for( unsigned int i = 0; i < NUM_WALLS; i++ ) {
-		glBindVertexArray( skyboxVAOds[i] );
-		glGenBuffers( 2, vbods );
-		glBindBuffer( GL_ARRAY_BUFFER, vbods[0] );
-		glBufferData( GL_ARRAY_BUFFER, sizeof(skyboxVerts[i]), skyboxVerts[i], GL_STATIC_DRAW );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbods[1] );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(skyBoxIndices), skyBoxIndices, GL_STATIC_DRAW );
-		glEnableVertexAttribArray(textureShaderAttributes.vPos);
-		glVertexAttribPointer(textureShaderAttributes.vPos, 3, GL_FLOAT, GL_FALSE, sizeof(VertexTextured), (void*) 0);
-		glEnableVertexAttribArray(textureShaderAttributes.vTextureCoord);
-		glVertexAttribPointer(textureShaderAttributes.vTextureCoord, 2, GL_FLOAT, GL_FALSE, sizeof(VertexTextured), (void*) (sizeof(float) * 3));
-	}
 }
 
 void populateEnemies() {
@@ -588,35 +455,6 @@ void populateEnemies() {
 }
 
 
-//draws the hero
-void drawHero(glm::mat4 playerMtx){
-	
-	//translated matricies for each of the body segments
-	glm::mat4 body1 = glm::translate( playerMtx, glm::vec3(0,1,0) );
-	glm::mat4 body2 = glm::translate( playerMtx, glm::vec3(0,2+0.5*animoffset,0) );
-	glm::mat4 body3 = glm::translate( playerMtx, glm::vec3(0,2.8+animoffset,0) );
-
-	//and one for the nose
-	glm::vec3 directionNormalized = glm::normalize( playerDir );
-    glm::vec3 rotationAxis = glm::cross( directionNormalized, glm::vec3(0,1,0) );
-    glm::mat4 nose = glm::translate( playerMtx, glm::vec3( 0, 2.8+animoffset, 0 )+0.3f*directionNormalized );
-    nose = glm::rotate( nose, -3.14f/2.0f, rotationAxis );
-
-	//draws each segment of the snowman with the correct color
-    glUniform4fv( customShaderUniforms.color, 1, &white[0] );
-	glUniformMatrix4fv( customShaderUniforms.modelMtx, 1, GL_FALSE, &body1[0][0] );
-	CSCI441::drawSolidSphere( 1, 16, 16 );
-
-	glUniformMatrix4fv( customShaderUniforms.modelMtx, 1, GL_FALSE, &body2[0][0] );
-	CSCI441::drawSolidSphere( 0.8, 16, 16 );
-
-	glUniformMatrix4fv( customShaderUniforms.modelMtx, 1, GL_FALSE, &body3[0][0] );
-	CSCI441::drawSolidSphere( 0.6, 16, 16 );
-
-	glUniform4fv( customShaderUniforms.color, 1, &orange[0] );
-    glUniformMatrix4fv( customShaderUniforms.modelMtx, 1, GL_FALSE, &nose[0][0] );
-    CSCI441::drawSolidCone( 1.0/10, 1, 16, 16 );
-}
 
 
 //******************************************************************************
@@ -630,47 +468,16 @@ void drawHero(glm::mat4 playerMtx){
 ////////////////////////////////////////////////////////////////////////////////
 void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	// use our texture shader program
-	textureShaderProgram->useProgram();
-	CSCI441::setVertexAttributeLocations( textureShaderAttributes.vPos, -1, textureShaderAttributes.vTextureCoord );
-
 	// set all our uniforms
 	glm::mat4 modelMatrix(1.0f), vp = projectionMatrix * viewMatrix;
 	glm::vec4 white(1,1,1,1);
-	
+
+
+	textureShaderProgram->useProgram();
 	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(textureShaderUniforms.viewProjectionMtx, 1, GL_FALSE, &vp[0][0]);
 	glUniform1ui(textureShaderUniforms.tex, GL_TEXTURE0);
 	glUniform4fv(textureShaderUniforms.color, 1, &white[0]);
-
-	// draw the skybox
-	for( unsigned int i = 0; i < 6; i++ ) {
-		glBindTexture( GL_TEXTURE_2D, skyboxHandles[i] );
-		glBindVertexArray( skyboxVAOds[i] );
-		glDrawElements( GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, (void*)0 );
-	}
-
-	// draw the platform
-	glBindTexture( GL_TEXTURE_2D, platformTextureHandle );
-	glBindVertexArray( platformVAOd );
-	glDrawElements( GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, (void*)0 );
-
-	customShaderProgram->useProgram();
-	CSCI441::setVertexAttributeLocations( customShaderAttributes.vPos, customShaderAttributes.vNorm, -1 );
-	// draw the enemies
-	
-	glUniformMatrix4fv(customShaderUniforms.viewProjectionMtx, 1, GL_FALSE, &vp[0][0]);
-	glUniform3fv(customShaderUniforms.light, 1, &lightPos[0]);
-	for( auto enemy : enemies ) {
-		enemy->draw( modelMatrix, customShaderUniforms.modelMtx, customShaderUniforms.color );
-	}
-
-	glm::mat4 playerMtx = glm::translate( modelMatrix, playerLoc );
-	drawHero(playerMtx);
-
-
-	textureShaderProgram->useProgram();
-	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &modelMatrix[0][0]);
-	glUniformMatrix4fv(textureShaderUniforms.viewProjectionMtx, 1, GL_FALSE, &vp[0][0]);
 	mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	skyboxModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	
@@ -896,7 +703,7 @@ int main( int argc, char *argv[] ) {
 		// while the game is still playing, the player can move the character
 		if(!playerWon){
 			updatePlayer();
-		}*/
+		}
 
 		//ones an outcome of the game has happened, only one message is displayed accordingly
 		if(!playerAlive&&!completionMessagePrinted){
@@ -905,7 +712,7 @@ int main( int argc, char *argv[] ) {
 		}else if(playerWon&&!completionMessagePrinted){
 			cout<<"\n\n\nHey, you won, good job!"<<endl;
 			completionMessagePrinted = true;
-		}
+		}*/
 		
 	}
 
