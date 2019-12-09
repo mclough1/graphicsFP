@@ -119,6 +119,20 @@ float finishLowerRightZ = -107.8f;
 bool paused = false;
 time_t startTime;
 
+// slope from finish line to staircase
+float slopeLeftX = 65.0f;
+float slopeRightX = 200.0f;
+float slopeLowerY = DEFAULT_Y_VAL;
+float slopeMiddleY = 12.0f;
+float slopeUpperY = 24.0f;
+float slopeLowerZ = 43.0f;
+float slopeMiddleZ = -32.75f;
+float slopeUpperZ = finishUpperLeftZ;
+float slopeTotalLowerDistance = slopeLowerZ - slopeMiddleZ;
+float slopeTotalLowerHeight = slopeMiddleY - slopeLowerY;
+float slopeTotalUpperDistance = slopeMiddleZ - slopeUpperZ;
+float slopeTotalUpperHeight = slopeUpperY - slopeMiddleY;
+
 //player values, from directional/positional to game state vaalues
 glm::vec3 playerPos = glm::vec3(startX, DEFAULT_Y_VAL, startZ);
 glm::vec3 playerDir = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -155,6 +169,7 @@ void updateCamera() {
 	}
 }
 
+
 void updateFreeCamera(){
 	if(moveUp){
 		freeCamPos += normalize(freeCamDir)*2.0f;
@@ -172,9 +187,7 @@ void updateFreeCamera(){
 }
 
 
-bool registerOpenGLTexture(unsigned char *textureData,
-                           unsigned int texWidth, unsigned int texHeight,
-                           GLuint &textureHandle) {
+bool registerOpenGLTexture(unsigned char *textureData, unsigned int texWidth, unsigned int texHeight, GLuint &textureHandle) {
     if(textureData == 0) {
         fprintf(stderr,"Cannot register texture; no data specified.");
         return false;
@@ -223,7 +236,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		moveUp = moveDown = moveRight = moveLeft = false;
 		updateCamera();
 	}
-		
 
 	if( action == GLFW_PRESS) {
 		switch( key ) {
@@ -245,7 +257,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 	if( action == GLFW_RELEASE) {
 		switch( key ) {
-			
 			case GLFW_KEY_W:
 				moveUp = false;
 				break;
@@ -261,6 +272,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		}
 	}
 }
+
 
 // mouse_button_callback() /////////////////////////////////////////////////////
 //
@@ -282,6 +294,7 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 	}
 }
 
+
 // cursor_callback() ///////////////////////////////////////////////////////////
 //
 //		We will register this function as GLFW's cursor movement callback.
@@ -292,7 +305,6 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 static void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
 	// make sure movement is in bounds of the window
 	// glfw captures mouse movement on entire screen
-
 	if( xpos > 0 && xpos < windowWidth ) {
 		if( ypos > 0 && ypos < windowHeight ) {
 			// active motion
@@ -301,7 +313,6 @@ static void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
 					mousePosition.x = xpos;
 					mousePosition.y = ypos;
 				} else {
-
 					if(freeCamOn){
 						freeCamAngles.x += (xpos - mousePosition.x)*0.005f;
 						freeCamAngles.y -= (ypos - mousePosition.y)*0.005f;
@@ -322,22 +333,18 @@ static void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
 							if( cameraAngles.z <= 2.0f ) cameraAngles.z = 2.0f;
 							if( cameraAngles.z >= 500.0f ) cameraAngles.z = 500.0f;
 						}
-					}
-
-					
+					}					
 					updateCamera();
 
 					mousePosition.x = xpos;
 					mousePosition.y = ypos;
 				}
 			}
-			// passive motion
-			else {
-
-			}
+			else {} // passive motion
 		}
 	}
 }
+
 
 // scroll_callback() ///////////////////////////////////////////////////////////
 //
@@ -355,6 +362,7 @@ static void scroll_callback(GLFWwindow* window, double xOffset, double yOffset )
 
 	updateCamera();
 }
+
 
 //******************************************************************************
 //
@@ -406,6 +414,7 @@ GLFWwindow* setupGLFW() {
 	return window;										// return the window that was created
 }
 
+
 // setupOpenGL() ///////////////////////////////////////////////////////////////
 //
 //      Used to setup everything OpenGL related.
@@ -420,6 +429,7 @@ void setupOpenGL() {
 
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// clear the frame buffer to black
 }
+
 
 // setupGLEW() /////////////////////////////////////////////////////////////////
 //
@@ -447,14 +457,14 @@ void setupGLEW() {
 	}
 }
 
+
 // setupTextures() /////////////////////////////////////////////////////////////
 //
 //      Load and register all the tetures for our program
 //
 ////////////////////////////////////////////////////////////////////////////////
-void setupTextures() {
-	
-}
+void setupTextures() { }
+
 
 void setupShaders() {
 	textureShaderProgram = new CSCI441::ShaderProgram( "shaders/textureShader.v.glsl", "shaders/textureShader.f.glsl" );
@@ -467,7 +477,6 @@ void setupShaders() {
 	textureShaderAttributes.vPos            = textureShaderProgram->getAttributeLocation( "vPos" );
 	textureShaderAttributes.vTextureCoord   = textureShaderProgram->getAttributeLocation( "vTextureCoord" );
 
-
 	customShaderProgram = new CSCI441::ShaderProgram( "shaders/modelShader.v.glsl", "shaders/modelShader.f.glsl" );
 
 	customShaderUniforms.modelMtx          = customShaderProgram->getUniformLocation( "modelMtx" );
@@ -479,7 +488,6 @@ void setupShaders() {
 	customShaderAttributes.vPos            = customShaderProgram->getAttributeLocation( "vPosition" );
 	//customShaderAttributes.vTextureCoord   = customShaderProgram->getAttributeLocation( "vTextureCoord" );
 	customShaderAttributes.vNorm   = customShaderProgram->getAttributeLocation( "vNormal" );
-
 }
 
 // setupBuffers() //////////////////////////////////////////////////////////////
@@ -488,11 +496,9 @@ void setupShaders() {
 //
 ////////////////////////////////////////////////////////////////////////////////
 void setupBuffers() {
-
 	///////////////////////////////////////////
-	//
 	// Models
-
+	//
 	mansionModel = new CSCI441::ModelLoader();
   	mansionModel->loadModelFile( mansionModelfile );
 	skyboxModel = new CSCI441::ModelLoader();
@@ -511,11 +517,7 @@ void setupBuffers() {
 		//cout << greenmarioModelfile << endl;
 		greenmarioModelFrames.back()->loadModelFile(greenmarioModelfile);
 	}
-
-
 }
-
-
 
 
 //******************************************************************************
@@ -532,7 +534,6 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	// set all our uniforms
 	glm::mat4 modelMatrix(1.0f), vp = projectionMatrix * viewMatrix;
 	glm::vec4 white(1,1,1,1);
-
 
 	textureShaderProgram->useProgram();
 	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &modelMatrix[0][0]);
@@ -558,8 +559,7 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 
 
 void updatePlayer() {
-	//cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
-	
+	cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
 	if(!paused)
 	{
 		// get the sum of the directional inputs from the player
@@ -586,6 +586,24 @@ void updatePlayer() {
 		}
 		
 		playerPos.y = DEFAULT_Y_VAL;
+		float currX = playerPos.x;
+		float currZ = playerPos.z;
+		if(currX > slopeLeftX && currX < slopeRightX)				// if within x bounds of slope
+		{
+			if(currZ < slopeLowerZ && currZ > slopeMiddleZ)			// if in lower half of slope
+			{
+				float zDiff = slopeLowerZ - currZ;
+				float zPercentage = zDiff / slopeTotalLowerDistance;
+				playerPos.y = slopeLowerY + (zPercentage * slopeTotalLowerHeight);
+			}
+			else if(currZ < slopeMiddleZ && currZ > slopeUpperZ)	// if in upper half of slope
+			{
+				float zDiff = slopeMiddleZ - currZ;
+				float zPercentage = zDiff / slopeTotalUpperDistance;
+				playerPos.y = slopeMiddleY + (zPercentage * slopeTotalUpperHeight);
+			}
+		}
+		
 		// this is for the animation cycle if the player is walking
 		if(moving == true){
 			currentFrame++;
@@ -598,6 +616,8 @@ void updatePlayer() {
 		}
 	}
 	
+	// if player reaches the "finish" (infront of staircase at mansion), apply glitch effect while player is frozen for 3 seconds
+	// 	then teleport back to start
 	if(playerPos.x > finishUpperLeftX && playerPos.x < finishLowerRightX && playerPos.z > finishUpperLeftZ && playerPos.z < finishLowerRightZ)
 	{
 		if(!paused)
@@ -617,6 +637,7 @@ void updatePlayer() {
 		}
 	}
 }
+
 
 ///*****************************************************************************
 //
@@ -685,8 +706,7 @@ int main( int argc, char *argv[] ) {
 		if(freeCamOn)
 		{
 			updateFreeCamera();
-		}
-		
+		}	
 	}
 
 	glfwDestroyWindow( window );// clean up and close our window
