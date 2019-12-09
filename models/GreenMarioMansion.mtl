@@ -10,8 +10,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\door.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\door.png
+map_Kd models\Textures\door.png
+map_d models\Textures\door.png
 
 newmtl material_11.000
 Ns 0.000000
@@ -22,8 +22,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\wall.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\wall.png
+map_Kd models\Textures\wall.png
+map_d models\Textures\wall.png
 
 newmtl material_15.000
 Ns 0.000000
@@ -34,8 +34,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\yuka2.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\yuka2.png
+map_Kd models\Textures\yuka2.png
+map_d models\Textures\yuka2.png
 
 newmtl material_16.000
 Ns 0.000000
@@ -46,8 +46,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\mansion1.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\mansion1.png
+map_Kd models\Textures\mansion1.png
+map_d models\Textures\mansion1.png
 
 newmtl material_17.000
 Ns 0.000000
@@ -58,8 +58,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\roka.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\roka.png
+map_Kd models\Textures\roka.png
+map_d models\Textures\roka.png
 
 newmtl material_17.001
 Ns 0.000000
@@ -70,8 +70,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\roka.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\roka.png
+map_Kd models\Textures\roka.png
+map_d models\Textures\roka.png
 
 newmtl material_19.000
 Ns 0.000000
@@ -82,8 +82,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\yuka3.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\yuka3.png
+map_Kd models\Textures\yuka3.png
+map_d models\Textures\yuka3.png
 
 newmtl material_19.001
 Ns 0.000000
@@ -94,8 +94,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\yuka3.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\yuka3.png
+map_Kd models\Textures\yuka3.png
+map_d models\Textures\yuka3.png
 
 newmtl material_21.000
 Ns 0.000000
@@ -106,8 +106,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\isinaka.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\isinaka.png
+map_Kd models\Textures\isinaka.png
+map_d models\Textures\isinaka.png
 
 newmtl material_3.000
 Ns 0.000000
@@ -118,8 +118,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\mansion3.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\mansion3.png
+map_Kd models\Textures\mansion3.png
+map_d models\Textures\mansion3.png
 
 newmtl material_5.000
 Ns 0.000000
@@ -130,8 +130,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\saku.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\saku.png
+map_Kd models\Textures\saku.png
+map_d models\Textures\saku.png
 
 newmtl material_8.000
 Ns 0.000000
@@ -142,8 +142,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\yane.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\yane.png
+map_Kd models\Textures\yane.png
+map_d models\Textures\yane.png
 
 newmtl material_9.000
 Ns 0.000000
@@ -154,5 +154,5 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\heri.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\heri.png
+map_Kd models\Textures\heri.png
+map_d models\Textures\heri.png

@@ -10,8 +10,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\isigaki.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\isigaki.png
+map_Kd models\Textures\isigaki.png
+map_d models\Textures\isigaki.png
 
 newmtl material_25.001
 Ns 0.000000
@@ -22,5 +22,5 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\haka.png
-map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\haka.png
+map_Kd models\Textures\haka.png
+map_d models\Textures\haka.png
