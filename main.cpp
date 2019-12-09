@@ -112,6 +112,7 @@ bool moveUp, moveDown, moveRight, moveLeft;
 bool playerAlive = true;
 bool playerWon = false;
 float playerSpeed = 0.5;
+bool moving = false;
 
 
 //colors
@@ -551,14 +552,16 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	glm::mat4 playerMtx = glm::translate(glm::mat4(1.0f), playerPos);
 	playerMtx = glm::rotate( playerMtx, -cameraAngles.x, upVector );
 	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &playerMtx[0][0]);
-	greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	
-	greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	currentFrame++;
-	if(currentFrame >= WALKING_FRAME_COUNT)
-	{
-		currentFrame = 0;
+
+	if(moving){
+		greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	}else{
+		greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	}
+	
+	
+	
+	
 	
 }
 
@@ -572,7 +575,7 @@ void updatePlayer() {
 	playerDir.y = 0.0;
 	playerDir = normalize(playerDir);
 	
-	bool moving = false;
+	moving = false;
 	if(moveUp){
 		playerPos += playerDir * playerSpeed;
 		moving = true;
@@ -593,8 +596,15 @@ void updatePlayer() {
 	playerPos.y = 6.0;
 	// this is for the animation cycle that bounce the character up and down
 	if(moving == true){
-		
+		currentFrame++;
+		if(currentFrame >= WALKING_FRAME_COUNT)
+		{
+			currentFrame = 0;
+		}
+	}else{
+		currentFrame = 0;
 	}
+
 
 
 
