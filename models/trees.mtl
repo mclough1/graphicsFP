@@ -1,0 +1,62 @@
+# Blender MTL File: 'None'
+# Material Count: 5
+
+newmtl material_24.002
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+
+newmtl material_24.003
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+
+newmtl material_24.009
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+
+newmtl material_24.010
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+
+newmtl material_24.011
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\ki_04.png

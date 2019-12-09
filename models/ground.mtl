@@ -1,0 +1,62 @@
+# Blender MTL File: 'None'
+# Material Count: 5
+
+newmtl material_18.000
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\grass_heri.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\grass_heri.png
+
+newmtl material_20.002
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\doro.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\doro.png
+
+newmtl material_26.001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\road.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\road.png
+
+newmtl material_27.000
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\grass.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\grass.png
+
+newmtl material_27.002
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\grass.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\grass.png

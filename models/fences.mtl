@@ -1,0 +1,26 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+
+newmtl material_14.000
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\saku2.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\saku2.png
+
+newmtl material_2.000
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd C:\\Users\\Matt\\Desktop\\models\\Textures\\tobira.png
+map_d C:\\Users\\Matt\\Desktop\\models\\Textures\\tobira.png

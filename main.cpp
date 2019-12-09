@@ -62,16 +62,31 @@ glm::vec3 freeCamPos(   0.0f, 0.0f, 0.0f );
 glm::vec3 freeCamDir( 0.0f,  0.0f,  0.0f );
 glm::vec3 freeCamLookAt( 0.0f,  0.0f,  0.0f );
 
-string mansionStr = "models/Luigis_Mansion.obj";
+string groundStr = "models/ground.obj";
+string treesStr = "models/trees.obj";
+string wallsStr = "models/walls.obj";
+string fencesStr = "models/fences.obj";
+string mansionStr = "models/GreenMarioMansion.obj";
 string skyboxStr = "models/Skybox.obj";
+string moonStr = "models/moon.obj";
 string greenMarioStr = "models/greenmario_stand.obj";
 
+const char* groundModelFile = groundStr.c_str();
+const char* treesModelFile = treesStr.c_str();
+const char* wallsModelFile = wallsStr.c_str();
+const char* fencesModelFile = fencesStr.c_str();
 const char* mansionModelfile = mansionStr.c_str();
 const char* skyboxModelfile = skyboxStr.c_str();
+const char* moonModelFile = moonStr.c_str();
 const char* greenMarioModelFile = greenMarioStr.c_str();
 
+CSCI441::ModelLoader* groundModel = NULL;
+CSCI441::ModelLoader* treesModel = NULL;
+CSCI441::ModelLoader* wallsModel = NULL;
+CSCI441::ModelLoader* fencesModel = NULL;
 CSCI441::ModelLoader* mansionModel = NULL;
 CSCI441::ModelLoader* skyboxModel = NULL;
+CSCI441::ModelLoader* moonModel = NULL;
 CSCI441::ModelLoader* greenMarioModel = NULL;
 
 const char* greenmarioModelfile = NULL;
@@ -512,6 +527,16 @@ void setupBuffers() {
   	skyboxModel->loadModelFile( skyboxModelfile );
 	greenMarioModel = new CSCI441::ModelLoader();
   	greenMarioModel->loadModelFile( greenMarioModelFile );
+	groundModel = new CSCI441::ModelLoader();
+  	groundModel->loadModelFile( groundModelFile );
+	treesModel = new CSCI441::ModelLoader();
+  	treesModel->loadModelFile( treesModelFile );
+	wallsModel = new CSCI441::ModelLoader();
+  	wallsModel->loadModelFile( wallsModelFile );
+	fencesModel = new CSCI441::ModelLoader();
+  	fencesModel->loadModelFile( fencesModelFile );
+	moonModel= new CSCI441::ModelLoader();
+  	moonModel->loadModelFile( moonModelFile );
 
 	for(int i = 1; i <= WALKING_FRAME_COUNT; ++i)
 	{
@@ -553,8 +578,13 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	
 	glUniform1ui(textureShaderUniforms.tex, GL_TEXTURE0);
 	glUniform4fv(textureShaderUniforms.color, 1, &white[0]);
-	mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	skyboxModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	moonModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	groundModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	treesModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	wallsModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	fencesModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 
 	glm::mat4 playerMtx = glm::translate(glm::mat4(1.0f), playerPos);
 	playerMtx = glm::rotate( playerMtx, -cameraAngles.x, upVector );
