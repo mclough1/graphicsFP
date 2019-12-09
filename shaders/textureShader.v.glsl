@@ -5,7 +5,7 @@ in vec2 vTextureCoord;
 
 out vec2 texCoord;
 
-out float distance;
+out float distanceToPoint;
 out vec3 lightToPoint;
 
 uniform vec3 lightPos;
@@ -19,5 +19,5 @@ void main() {
   texCoord = vTextureCoord;
   
   lightToPoint = normalize(vPos - lightPos);
-  distance = distance(vPos, lightPos);
+  distanceToPoint = distance(vPos, lightPos);
 }

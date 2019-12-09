@@ -473,7 +473,7 @@ void setupShaders() {
 	textureShaderUniforms.modelMtx          = textureShaderProgram->getUniformLocation( "modelMtx" );
 	textureShaderUniforms.viewProjectionMtx = textureShaderProgram->getUniformLocation( "viewProjectionMtx" );
 	textureShaderUniforms.tex               = textureShaderProgram->getUniformLocation( "tex" );
-	textureShaderUniforms.color             = textureShaderProgram->getUniformLocation( "color" );
+	// textureShaderUniforms.color             = textureShaderProgram->getUniformLocation( "color" );
 	textureShaderUniforms.lightPos          = textureShaderProgram->getUniformLocation( "lightPos" ); //flashlight position
 	textureShaderUniforms.lightDir          = textureShaderProgram->getUniformLocation( "lightDir" ); //flashlight direction
 	textureShaderAttributes.vPos            = textureShaderProgram->getAttributeLocation( "vPos" );
@@ -566,7 +566,7 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 
 
 void updatePlayer() {
-	cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
+	//cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
 	if(!paused)
 	{
 		// get the sum of the directional inputs from the player
