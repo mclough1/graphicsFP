@@ -29,16 +29,14 @@
 #include <stdlib.h>				// for exit functionality
 #include <time.h>				// for time functionality
 
-#include <sstream>
-
 #include <vector>					// for vector
+#include <sstream>
+#include <ctime>
 
 #include <CSCI441/modelLoader3.hpp> // to load in OBJ models
 #include <CSCI441/objects3.hpp>
 #include <CSCI441/ShaderProgram3.hpp>
 #include <CSCI441/TextureUtils.hpp>
-
-
 
 using namespace std;
 
@@ -51,7 +49,8 @@ bool controlDown = false;
 bool leftMouseDown = false;
 glm::vec2 mousePosition( -9999.0f, -9999.0f );
 
-glm::vec3 cameraAngles( -1.57f, 2.01f, 40.0f );
+glm::vec3 cameraAngles(-4.71f, 1.65f, 15.0f);
+glm::vec3 originalCameraAngles(-4.71f, 1.65f, 15.0f);
 glm::vec3 eyePoint(   0.0f, 0.0f, 0.0f );
 glm::vec3 lookAtPoint( 0.0f,  0.0f,  0.0f );
 glm::vec3 upVector(    0.0f,  1.0f,  0.0f );
@@ -104,22 +103,30 @@ const GLfloat GROUND_SIZE = 18;
 const GLfloat ENEMY_RADIUS = 1.0;
 const GLint NUM_ENEMIES = 5;
 
+//colors
+glm::vec4 white(1,1,1,1);
+glm::vec4 orange(1,0.5,0,1);
+glm::vec4 black(0,0,0,1);
+
+// resetPosition constant values (startPos, endBox)
+float startX = 28.4f;
+float startZ = -188.0f;
+float DEFAULT_Y_VAL = 6.25;
+float finishUpperLeftX = 131.5f;		// corner of finish box next to left of staircase, facing the mansion
+float finishUpperLeftZ = -112.65f;
+float finishLowerRightX = 144.0f;		// corner of finish box in front of right of staircase
+float finishLowerRightZ = -107.8f;
+bool paused = false;
+time_t startTime;
+
 //player values, from directional/positional to game state vaalues
-glm::vec3 playerPos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 playerPos = glm::vec3(startX, DEFAULT_Y_VAL, startZ);
 glm::vec3 playerDir = glm::vec3(0.0f, 0.0f, 0.0f);
 bool moveUp, moveDown, moveRight, moveLeft;
 bool playerAlive = true;
 bool playerWon = false;
 float playerSpeed = 0.5;
 bool moving = false;
-
-
-//colors
-glm::vec4 white(1,1,1,1);
-glm::vec4 orange(1,0.5,0,1);
-glm::vec4 black(0,0,0,1);
-
-
 
 //******************************************************************************
 //
@@ -539,61 +546,76 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	playerMtx = glm::rotate( playerMtx, -cameraAngles.x, upVector );
 	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &playerMtx[0][0]);
 
-	if(moving){
+	if(moving)
+	{
 		greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	}else{
-		greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	}
-	
-	
-	
-	
-	
+	else
+	{
+		greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	}	
 }
-
 
 
 void updatePlayer() {
 	//cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
 	
-	// get the sum of the directional inputs from the player
-	playerDir = lookAtPoint-eyePoint;
-	playerDir.y = 0.0;
-	playerDir = normalize(playerDir);
-	
-	moving = false;
-	if(moveUp){
-		playerPos += playerDir * playerSpeed;
-		moving = true;
-	}
-	if(moveDown){
-		playerPos -= playerDir * playerSpeed;
-		moving = true;
-	}
-	if(moveRight){
-		playerPos += normalize(cross(playerDir, upVector))*playerSpeed;
-		moving = true;
-	}
-	if(moveLeft){
-		playerPos -= normalize(cross(playerDir, upVector))*playerSpeed;
-		moving = true;
-	}
-
-	playerPos.y = 6.25;
-	// this is for the animation cycle that bounce the character up and down
-	if(moving == true){
-		currentFrame++;
-		if(currentFrame >= WALKING_FRAME_COUNT)
-		{
+	if(!paused)
+	{
+		// get the sum of the directional inputs from the player
+		playerDir = lookAtPoint-eyePoint;
+		playerDir.y = 0.0;
+		playerDir = normalize(playerDir);
+		
+		moving = false;
+		if(moveUp){
+			playerPos += playerDir * playerSpeed;
+			moving = true;
+		}
+		if(moveDown){
+			playerPos -= playerDir * playerSpeed;
+			moving = true;
+		}
+		if(moveRight){
+			playerPos += normalize(cross(playerDir, upVector))*playerSpeed;
+			moving = true;
+		}
+		if(moveLeft){
+			playerPos -= normalize(cross(playerDir, upVector))*playerSpeed;
+			moving = true;
+		}
+		
+		playerPos.y = DEFAULT_Y_VAL;
+		// this is for the animation cycle if the player is walking
+		if(moving == true){
+			currentFrame++;
+			if(currentFrame >= WALKING_FRAME_COUNT)
+			{
+				currentFrame = 0;
+			}
+		}else{
 			currentFrame = 0;
 		}
-	}else{
-		currentFrame = 0;
 	}
-
-
-
-
+	
+	if(playerPos.x > finishUpperLeftX && playerPos.x < finishLowerRightX && playerPos.z > finishUpperLeftZ && playerPos.z < finishLowerRightZ)
+	{
+		if(!paused)
+		{
+			startTime = time(NULL);
+			paused = true;
+		}
+		else
+		{
+			if(time(NULL) - startTime > 3)
+			{
+				playerPos.x = startX;
+				playerPos.z = startZ;
+				cameraAngles = originalCameraAngles;
+				paused = false;
+			}
+		}
+	}
 }
 
 ///*****************************************************************************
@@ -646,20 +668,24 @@ int main( int argc, char *argv[] ) {
 		if(freeCamOn){
 			viewMatrix = glm::lookAt( freeCamPos, freeCamLookAt, upVector );
 		}
-		
 
 		// draw everything to the window
 		// pass our view and projection matrices as well as deltaTime between frames
 		renderScene( viewMatrix, projectionMatrix );
 
-		glfwSwapBuffers(window);// flush the OpenGL commands and make sure they get rendered!
+		glfwSwapBuffers(window);		// flush the OpenGL commands and make sure they get rendered!
 		glfwPollEvents();				// check for any events and signal to redraw screen
 
-		
-		updatePlayer();
+		if(!freeCamOn)
+		{
+			updatePlayer();
+		}	
 		updateCamera();
 		
-		updateFreeCamera();
+		if(freeCamOn)
+		{
+			updateFreeCamera();
+		}
 		
 	}
 
