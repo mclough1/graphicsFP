@@ -38,7 +38,7 @@
 #include <CSCI441/ShaderProgram3.hpp>
 #include <CSCI441/TextureUtils.hpp>
 
-#include "include/Enemy.h"
+
 
 using namespace std;
 
@@ -100,7 +100,6 @@ struct ShaderAttributeLocations {
 } textureShaderAttributes, customShaderAttributes;
 
 //enemy values, number of enemies and thier size
-std::vector< Enemy* > enemies;
 const GLfloat GROUND_SIZE = 18;
 const GLfloat ENEMY_RADIUS = 1.0;
 const GLint NUM_ENEMIES = 5;
@@ -509,19 +508,6 @@ void setupBuffers() {
 
 }
 
-void populateEnemies() {
-    srand( time(NULL) );
-    const float RANGE_X = GROUND_SIZE*2;
-    const float RANGE_Z = GROUND_SIZE*2;
-    for(int i = 0; i < NUM_ENEMIES; i++) {
-        // TODO: Populate our enemy locations
-        Enemy* m = new Enemy( glm::vec3( rand()/(float)RAND_MAX * RANGE_X - RANGE_X/2.0f, 0.0f, (RANGE_Z * (i/(float)NUM_ENEMIES)) - RANGE_Z/2.0f),
-                            	glm::vec3( rand()/(float)RAND_MAX - 0.5, 0.0, rand()/(float)RAND_MAX - 0.5 ),
-                            	ENEMY_RADIUS * (rand()/(float)RAND_MAX+0.25) );
-        enemies.push_back( m );
-    }
-}
-
 
 
 
@@ -627,7 +613,6 @@ int main( int argc, char *argv[] ) {
 	setupShaders();										// load our shaders into memory
 	setupBuffers();										// load all our VAOs and VBOs into memory
 	setupTextures();									// load all textures into memory
-	populateEnemies();								// generate enemies
 
 	updateCamera();		// set up our camera position
 
