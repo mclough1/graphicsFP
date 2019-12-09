@@ -107,6 +107,7 @@ struct ShaderUniformLocations {
 	GLint camera;
 	GLint lightPos;
 	GLint lightDir;
+	GLint shake;
 } textureShaderUniforms, customShaderUniforms;
 struct ShaderAttributeLocations {
 	GLint vPos;
@@ -501,15 +502,16 @@ void setupShaders() {
 	textureShaderAttributes.vTextureCoord   = textureShaderProgram->getAttributeLocation( "vTextureCoord" );
 
 	customShaderProgram = new CSCI441::ShaderProgram( "shaders/modelShader.v.glsl", "shaders/modelShader.f.glsl" );
-
+	
 	customShaderUniforms.modelMtx          = customShaderProgram->getUniformLocation( "modelMtx" );
 	customShaderUniforms.viewProjectionMtx = customShaderProgram->getUniformLocation( "viewProjectionMtx" );
-	customShaderUniforms.color             = customShaderProgram->getUniformLocation( "color" );
-	//customShaderUniforms.camera             = customShaderProgram->getUniformLocation( "color" );
-	
-	customShaderAttributes.vPos            = customShaderProgram->getAttributeLocation( "vPosition" );
-	//customShaderAttributes.vTextureCoord   = customShaderProgram->getAttributeLocation( "vTextureCoord" );
-	customShaderAttributes.vNorm   = customShaderProgram->getAttributeLocation( "vNormal" );
+	customShaderUniforms.tex               = customShaderProgram->getUniformLocation( "tex" );
+	// textureShaderUniforms.color             = textureShaderProgram->getUniformLocation( "color" );
+	customShaderUniforms.lightPos          = customShaderProgram->getUniformLocation( "lightPos" ); //flashlight position
+	customShaderUniforms.lightDir          = customShaderProgram->getUniformLocation( "lightDir" ); //flashlight direction
+	customShaderAttributes.vPos            = customShaderProgram->getAttributeLocation( "vPos" );
+	customShaderAttributes.vTextureCoord   = customShaderProgram->getAttributeLocation( "vTextureCoord" );
+	customShaderUniforms.shake               = customShaderProgram->getUniformLocation( "shake" );
 }
 
 // setupBuffers() //////////////////////////////////////////////////////////////
@@ -538,7 +540,7 @@ void setupBuffers() {
 	moonModel= new CSCI441::ModelLoader();
   	moonModel->loadModelFile( moonModelFile );
 
-	for(int i = 1; i <= WALKING_FRAME_COUNT; ++i)
+	/*for(int i = 1; i <= WALKING_FRAME_COUNT; ++i)
 	{
 		std::stringstream ss;
 		ss << i;
@@ -548,7 +550,7 @@ void setupBuffers() {
 		greenmarioModelfile = (greenmarioFilenameTemplate + frameNumber + ".obj").c_str();
 		//cout << greenmarioModelfile << endl;
 		greenmarioModelFrames.back()->loadModelFile(greenmarioModelfile);
-	}
+	}*/
 }
 
 
@@ -576,28 +578,61 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	glUniform3fv(textureShaderUniforms.lightPos, 1, &lightPos[0]);
 	glUniform3fv(textureShaderUniforms.lightDir, 1, &playerDir[0]);
 	
+	
 	glUniform1ui(textureShaderUniforms.tex, GL_TEXTURE0);
 	glUniform4fv(textureShaderUniforms.color, 1, &white[0]);
-	skyboxModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	moonModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	groundModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	treesModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	wallsModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	fencesModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-
+	
 	glm::mat4 playerMtx = glm::translate(glm::mat4(1.0f), playerPos);
 	playerMtx = glm::rotate( playerMtx, -cameraAngles.x, upVector );
 	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &playerMtx[0][0]);
+	
+	greenMarioModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
+	
+	
 
-	if(moving)
-	{
-		greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	
+
+	
+	if(paused){
+		customShaderProgram->useProgram();
+		glm::vec3 shakeVec = glm::vec3(((double) rand() / (RAND_MAX))*2.0f-1.0f,((double) rand() / (RAND_MAX))*2.0f-1.0f,((double) rand() / (RAND_MAX))*2.0f-1.0f);
+		
+		glUniformMatrix4fv(customShaderUniforms.modelMtx, 1, GL_FALSE, &modelMatrix[0][0]);
+		glUniformMatrix4fv(customShaderUniforms.viewProjectionMtx, 1, GL_FALSE, &vp[0][0]);
+		glUniform3fv(customShaderUniforms.lightPos, 1, &lightPos[0]);
+		glUniform3fv(customShaderUniforms.lightDir, 1, &playerDir[0]);
+		glUniform1ui(customShaderUniforms.tex, GL_TEXTURE0);
+		glUniform3fv(customShaderUniforms.shake, 1,  &shakeVec[0]);
+		glUniform4fv(customShaderUniforms.color, 1, &white[0]);
+		
+		skyboxModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
+		moonModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
+		groundModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
+		mansionModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
+		treesModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
+		wallsModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
+		fencesModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
+		
+	}else{
+		glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &modelMatrix[0][0]);
+		
+		skyboxModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+		moonModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+		groundModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+		mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+		treesModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+		wallsModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+		fencesModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	}
-	else
-	{
-		greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	}	
+	
+	//if(moving)
+	//{
+	//	greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	//}
+	//else
+	//{
+	//	greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	//}	
 }
 
 
