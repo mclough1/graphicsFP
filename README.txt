@@ -8,23 +8,23 @@ Description: You are Green Mario and you are exploring Luigi(TM)'s mansion. You 
 	and explore with your trusty flashlight!
 	
 Usage:
-	run program 	- ./FP
+	run program 	- ./FP or make run
 	movement 		- WASD
 	
 Compliling:
 	Type make.
 	
 Implementation/Bugs:
-	
+	To use the map file we found we had to seperarate most of it's parts into individual obj files in order to 
+	properly render them from back to front.
 	
 Input file format:
-	
+	No file inputs
 	
 Responsibilities:
-	(so far)
-	Lake	: attempted MD5 implementation, made this file
-	Matt	: Loading + texturing of map
-	Joeseph	: Model and animation creation
+	Lake	: attempted MD5 loading + rendering, Flashlight and moonlight
+	Matt	: Loading + texturing of map, rendering of map, movement
+	Joeseph	: Model animation, animation rendering, bounding boxes/height maps
 	
 How long did this assignment take you?
 	
