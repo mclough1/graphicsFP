@@ -90,7 +90,8 @@ struct ShaderUniformLocations {
 	GLint tex;
 	GLint color;
 	GLint camera;
-	GLint light;
+	GLint lightPos;
+	GLint lightDir;
 } textureShaderUniforms, customShaderUniforms;
 struct ShaderAttributeLocations {
 	GLint vPos;
@@ -473,7 +474,8 @@ void setupShaders() {
 	textureShaderUniforms.viewProjectionMtx = textureShaderProgram->getUniformLocation( "viewProjectionMtx" );
 	textureShaderUniforms.tex               = textureShaderProgram->getUniformLocation( "tex" );
 	textureShaderUniforms.color             = textureShaderProgram->getUniformLocation( "color" );
-	
+	textureShaderUniforms.lightPos          = textureShaderProgram->getUniformLocation( "lightPos" ); //flashlight position
+	textureShaderUniforms.lightDir          = textureShaderProgram->getUniformLocation( "lightDir" ); //flashlight direction
 	textureShaderAttributes.vPos            = textureShaderProgram->getAttributeLocation( "vPos" );
 	textureShaderAttributes.vTextureCoord   = textureShaderProgram->getAttributeLocation( "vTextureCoord" );
 
@@ -483,7 +485,6 @@ void setupShaders() {
 	customShaderUniforms.viewProjectionMtx = customShaderProgram->getUniformLocation( "viewProjectionMtx" );
 	customShaderUniforms.color             = customShaderProgram->getUniformLocation( "color" );
 	//customShaderUniforms.camera             = customShaderProgram->getUniformLocation( "color" );
-	customShaderUniforms.light             = customShaderProgram->getUniformLocation( "lightPos" );
 	
 	customShaderAttributes.vPos            = customShaderProgram->getAttributeLocation( "vPosition" );
 	//customShaderAttributes.vTextureCoord   = customShaderProgram->getAttributeLocation( "vTextureCoord" );
@@ -538,6 +539,12 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	textureShaderProgram->useProgram();
 	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(textureShaderUniforms.viewProjectionMtx, 1, GL_FALSE, &vp[0][0]);
+	
+	//Flashlight uniforms
+	glm::vec3 lightPos = playerPos;
+	glUniform3fv(textureShaderUniforms.lightPos, 1, &lightPos[0]);
+	glUniform3fv(textureShaderUniforms.lightDir, 1, &playerDir[0]);
+	
 	glUniform1ui(textureShaderUniforms.tex, GL_TEXTURE0);
 	glUniform4fv(textureShaderUniforms.color, 1, &white[0]);
 	mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
