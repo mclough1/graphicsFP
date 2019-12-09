@@ -19,6 +19,6 @@ void main() {
 		light = max(1, 2 * 10/distanceToPoint)	;
 	  }
   fragColorOut = texture( tex, texCoord );
-  fragColorOut = vec4(fragColorOut.rgb * light + (vec3(75, 40, 0.0) * moon), fragColorOut.a);
+  fragColorOut = vec4(fragColorOut.rgb * light + (vec3(90, 40, 0.0) * moon), fragColorOut.a);
   
 }

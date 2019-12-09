@@ -120,6 +120,12 @@ float finishLowerRightZ = -107.8f;
 bool paused = false;
 time_t startTime;
 
+// box to prevent player from going into the mansion
+float mansionLeftX = 29.25f;
+float mansionLeftZ = -350.0f;
+float mansionRightX = 350.0f;
+float mansionRightZ = -113.0f;
+
 // slope from finish line to staircase
 float slopeLeftX = 65.0f;
 float slopeRightX = 200.0f;
@@ -574,27 +580,40 @@ void updatePlayer() {
 		playerDir.y = 0.0;
 		playerDir = normalize(playerDir);
 		
+		glm::vec3 nextPos = playerPos;
+		
 		moving = false;
 		if(moveUp){
-			playerPos += playerDir * playerSpeed;
+			nextPos += playerDir * playerSpeed;
 			moving = true;
 		}
 		if(moveDown){
-			playerPos -= playerDir * playerSpeed;
+			nextPos -= playerDir * playerSpeed;
 			moving = true;
 		}
 		if(moveRight){
-			playerPos += normalize(cross(playerDir, upVector))*playerSpeed;
+			nextPos += normalize(cross(playerDir, upVector))*playerSpeed;
 			moving = true;
 		}
 		if(moveLeft){
-			playerPos -= normalize(cross(playerDir, upVector))*playerSpeed;
+			nextPos -= normalize(cross(playerDir, upVector))*playerSpeed;
 			moving = true;
+		}
+		
+		if(nextPos.x > mansionLeftX && nextPos.x < mansionRightX && nextPos.z > mansionLeftZ && nextPos.z < mansionRightZ)
+		{
+			playerPos = playerPos;
+		}
+		else
+		{
+			playerPos = nextPos;
 		}
 		
 		playerPos.y = DEFAULT_Y_VAL;
 		float currX = playerPos.x;
 		float currZ = playerPos.z;
+		
+		// slope leading to staircase
 		if(currX > slopeLeftX && currX < slopeRightX)				// if within x bounds of slope
 		{
 			if(currZ < slopeLowerZ && currZ > slopeMiddleZ)			// if in lower half of slope
