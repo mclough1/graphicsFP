@@ -63,11 +63,15 @@ glm::vec3 freeCamLookAt( 0.0f,  0.0f,  0.0f );
 
 string mansionStr = "models/Luigis_Mansion.obj";
 string skyboxStr = "models/Skybox.obj";
+string greenMarioStr = "models/greenmario_stand.obj";
 
 const char* mansionModelfile = mansionStr.c_str();
 const char* skyboxModelfile = skyboxStr.c_str();
+const char* greenMarioModelFile = greenMarioStr.c_str();
+
 CSCI441::ModelLoader* mansionModel = NULL;
 CSCI441::ModelLoader* skyboxModel = NULL;
+CSCI441::ModelLoader* greenMarioModel = NULL;
 
 //two shaders, one texture shader for the platform and skybox, and a custom one for everything else
 CSCI441::ShaderProgram* textureShaderProgram = NULL;
@@ -94,17 +98,12 @@ const GLfloat ENEMY_RADIUS = 1.0;
 const GLint NUM_ENEMIES = 5;
 
 //player values, from directional/positional to game state vaalues
-glm::vec3 playerLoc = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 playerVel = glm::vec3(0.0f, 0.0f, 0.0f);
-float pushVel = 0.0;
-float pushAcc = 0.03;
-glm::vec3 pushDir = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 playerPos = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 playerDir = glm::vec3(0.0f, 0.0f, 0.0f);
 bool moveUp, moveDown, moveRight, moveLeft;
-float playerSpeed = 0.5;
 bool playerAlive = true;
 bool playerWon = false;
-float animoffset, animstate;
+float playerSpeed = 0.5;
 
 
 //colors
@@ -136,6 +135,8 @@ void updateCamera() {
 		eyePoint.x = cameraAngles.z * sinf( cameraAngles.x ) * sinf( cameraAngles.y );
 		eyePoint.y = cameraAngles.z * -cosf( cameraAngles.y );
 		eyePoint.z = cameraAngles.z * -cosf( cameraAngles.x ) * sinf( cameraAngles.y );
+		eyePoint+=playerPos;
+		lookAtPoint = playerPos;
 	}
 }
 
@@ -478,11 +479,11 @@ void setupBuffers() {
 	// Models
 
 	mansionModel = new CSCI441::ModelLoader();
-	//model->enableAutoGenerateNormals();
   	mansionModel->loadModelFile( mansionModelfile );
 	skyboxModel = new CSCI441::ModelLoader();
-	//model->enableAutoGenerateNormals();
   	skyboxModel->loadModelFile( skyboxModelfile );
+	greenMarioModel = new CSCI441::ModelLoader();
+  	greenMarioModel->loadModelFile( greenMarioModelFile );
 
 
 
@@ -528,155 +529,49 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	glUniform4fv(textureShaderUniforms.color, 1, &white[0]);
 	mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	skyboxModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+
+	glm::mat4 playerMtx = glm::translate(glm::mat4(1.0f), playerPos);
+	playerMtx = glm::rotate( playerMtx, -cameraAngles.x, upVector );
+	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &playerMtx[0][0]);
+	greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	
 }
 
-void moveEnemies() {
-	// Move every enemy forward along its heading
-	for(Enemy* enemy: enemies){
-		enemy->moveForward(playerLoc);
-	}
-}
 
-void enemiesFallOff() {
-	// Check if any enemy passes beyond any wall, and kill them
-	for(Enemy* enemy: enemies){
-		if((enemy->location.x > GROUND_SIZE) || (enemy->location.x < -GROUND_SIZE) || (enemy->location.z > GROUND_SIZE) || (enemy->location.z < -GROUND_SIZE)){
-			enemy->state = Enemy::State::DEAD;
-		}
-	}
-
-	// if all of the enemies are dead then player wins
-	playerWon = true;
-	for(Enemy* enemy: enemies){
-		if(enemy->state == Enemy::State::ALIVE){
-			playerWon = false;
-			return;
-		}
-	}
-	
-}
-
-void collideEnemiesWithEachother() {
-	
-	// check for inter-enemy collisions
-	// warning this isn't perfect...enemies can get caught and
-	// continually bounce back-and-forth in place off
-	// each other
-	for(int i =0; i<NUM_ENEMIES-1; i++){
-		for(int j = i+1; j<NUM_ENEMIES; j++){
-			if(distance(enemies[i]->location, enemies[j]->location) < enemies[i]->getRadius() + enemies[j]->getRadius()){
-				enemies[i]->moveBackward();
-				enemies[j]->moveBackward();
-				glm::vec3 norm = glm::normalize(enemies[i]->location-enemies[j]->location);
-				enemies[i]->direction = enemies[i]->direction - 2*glm::dot(enemies[i]->direction, norm)*norm;
-				enemies[j]->direction = enemies[j]->direction - 2*glm::dot(enemies[j]->direction, -1.0f*norm)*norm*-1.0f;
-				float swapVel = enemies[i]->velocity;
-				enemies[i]->velocity = enemies[j]->velocity;
-				enemies[j]->velocity = swapVel;
-			}
-		}
-	}
-
-}
-
-void collideEnemiesWithPlayer() {
-	
-	// check for enemy collisions with player
-	// warning this isn't perfect...they can also get caught and
-	// continually bounce back-and-forth in place off
-	// each other
-	for(int i =0; i<NUM_ENEMIES; i++){
-		
-		if(distance(enemies[i]->location, playerLoc) < enemies[i]->getRadius() + 1 && enemies[i]->state == Enemy::State::ALIVE){
-			enemies[i]->moveBackward();
-			glm::vec3 norm = glm::normalize(enemies[i]->location-playerLoc);
-			enemies[i]->direction = enemies[i]->direction - 2*glm::dot(enemies[i]->direction, norm)*norm;
-			if(playerVel.x == 0&&playerVel.z == 0 ){
-				pushDir = normalize(-1.0f * enemies[i]->direction);
-			}else{
-				pushDir = normalize(normalize(playerVel) - 2*glm::dot(normalize(playerVel), -1.0f*norm)*norm*-1.0f);
-			}
-			
-			enemies[i]->velocity = 0.6;
-			pushVel = 0.5;
-		}
-		
-	}
-
-}
 
 void updatePlayer() {
 	
-	// if the player died, then they fall down
-	if(!playerAlive){
-		playerVel.y-=pushAcc;
-		playerLoc += playerVel;
-		return;
-
-	}
-
-	// if the player is outside the platform then kill them
-	if((playerLoc.x > GROUND_SIZE) || (playerLoc.x < -GROUND_SIZE) || (playerLoc.z > GROUND_SIZE) || (playerLoc.z < -GROUND_SIZE)){
-			playerAlive = false;
-			playerVel = glm::vec3(0.0f, 0.0f, 0.0f);
-			return;
-	}
 	
-	// just make sure the pushed velocity is >= 0
-	if(pushVel <= 0){
-		pushVel = 0;
-	}
-
-	// player velocity is a combination of the input controlls or the most recent bounce, which decays
-	playerVel = pushDir*pushVel;
-
-	//decay the push velocity
-	pushVel-=pushAcc;
-
 	// get the sum of the directional inputs from the player
-	playerDir = glm::vec3(0.0f, 0.0f, 0.0f);
+	playerDir = lookAtPoint-eyePoint;
+	playerDir.y = 0.0;
+	playerDir = normalize(playerDir);
 	
 	bool moving = false;
 	if(moveUp){
-		playerDir += glm::vec3(playerSpeed, 0.0f, 0.0f);
+		playerPos += playerDir * playerSpeed;
 		moving = true;
 	}
 	if(moveDown){
-		playerDir += glm::vec3(-playerSpeed, 0.0f, 0.0f);
+		playerPos -= playerDir * playerSpeed;
 		moving = true;
 	}
 	if(moveRight){
-		playerDir += glm::vec3(0.0f, 0.0f, playerSpeed);
+		playerPos += normalize(cross(playerDir, upVector))*playerSpeed;
 		moving = true;
 	}
 	if(moveLeft){
-		playerDir += glm::vec3(0.0f, 0.0f, -playerSpeed);
+		playerPos -= normalize(cross(playerDir, upVector))*playerSpeed;
 		moving = true;
 	}
 
+	playerPos.y = 6.0;
 	// this is for the animation cycle that bounce the character up and down
 	if(moving == true){
-		animstate++;
-		if(animstate>8&&animstate<16){
-			animoffset = 0.3;
-		}else if(animstate>=16){
-			animstate = 0.0;
-			animoffset = 0.0;
-		}
-	}else{
-		animstate = 0.0;
-		animoffset = 0.0;
+		
 	}
 
-	// when hit the player is effectively stunned and thier inputs do not matter, the player moves in the direction of the bounce
-	// if there is no current push velocity then add the player input to the player velocity
-	if(pushVel <= 0){
-		playerVel += playerDir;
-	}
-	
-	// step the player
-	playerLoc += playerVel;
+
 
 }
 
@@ -732,10 +627,6 @@ int main( int argc, char *argv[] ) {
 		if(freeCamOn){
 			viewMatrix = glm::lookAt( freeCamPos, freeCamLookAt, upVector );
 		}
-		if(!playerAlive){
-			//death cam
-			viewMatrix = glm::lookAt( glm::vec3(playerLoc.x*1.1, 3.0f, playerLoc.z*1.1), glm::vec3(playerLoc.x, -3.0f, playerLoc.z), upVector );
-		}
 		
 
 		// draw everything to the window
@@ -745,26 +636,10 @@ int main( int argc, char *argv[] ) {
 		glfwSwapBuffers(window);// flush the OpenGL commands and make sure they get rendered!
 		glfwPollEvents();				// check for any events and signal to redraw screen
 
-		/*// while the player is alive, move the enemies
-		if(playerAlive){
-			moveEnemies();
-			enemiesFallOff();
-			collideEnemiesWithEachother();
-			collideEnemiesWithPlayer();
-		}
-		// while the game is still playing, the player can move the character
-		if(!playerWon){
-			updatePlayer();
-		}
-
-		//ones an outcome of the game has happened, only one message is displayed accordingly
-		if(!playerAlive&&!completionMessagePrinted){
-			cout<<"\n\n\nOh no, you died. Game Over."<<endl;
-			completionMessagePrinted = true;
-		}else if(playerWon&&!completionMessagePrinted){
-			cout<<"\n\n\nHey, you won, good job!"<<endl;
-			completionMessagePrinted = true;
-		}*/
+		
+		updatePlayer();
+		updateCamera();
+		
 		updateFreeCamera();
 		
 	}
