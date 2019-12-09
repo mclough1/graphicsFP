@@ -568,7 +568,7 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 
 
 void updatePlayer() {
-	
+	cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
 	
 	// get the sum of the directional inputs from the player
 	playerDir = lookAtPoint-eyePoint;
@@ -593,7 +593,7 @@ void updatePlayer() {
 		moving = true;
 	}
 
-	playerPos.y = 6.0;
+	playerPos.y = 6.25;
 	// this is for the animation cycle that bounce the character up and down
 	if(moving == true){
 		currentFrame++;
@@ -635,7 +635,6 @@ int main( int argc, char *argv[] ) {
 	CSCI441::drawSolidSphere( 1, 16, 16 );	// strange hack I need to make spheres draw - don't have time to investigate why..it's a bug with my library
 	CSCI441::drawSolidCone( 1.0, 2.0, 16, 16 );//I too noticed this bug, wish I had seen this comment^ sooner
 
-	bool completionMessagePrinted = false;
 	//  This is our draw loop - all rendering is done here.  We use a loop to keep the window open
 	//	until the user decides to close the window and quit the program.  Without a loop, the
 	//	window will display once and then the program exits.
