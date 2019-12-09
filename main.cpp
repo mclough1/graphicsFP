@@ -1,33 +1,24 @@
 /*
- *  CSCI 441, Computer Graphics, Fall 2017
+ *  CSCI 441, Computer Graphics, Fall 2019
  *
- *  Project: lab11
+ *  Project: FinalProject
  *  File: main.cpp
  *
- *  Description:
- *      This file contains the basic setup to work with VAOs & VBOs using a
- *	MD5 model.
- *
- *  Author: Dr. Paone, Colorado School of Mines, 2017
- *
- *
  */
-
 //******************************************************************************
-
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>			// include GLFW framework header
+#include <GLFW/glfw3.h>				// include GLFW framework header
 
 // include GLM libraries and matrix functions
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <SOIL/SOIL.h>		// for image loading
+#include <SOIL/SOIL.h>				// for image loading
 
-#include <stdio.h>				// for printf functionality
+#include <stdio.h>					// for printf functionality
 #include <iostream>
-#include <stdlib.h>				// for exit functionality
-#include <time.h>				// for time functionality
+#include <stdlib.h>					// for exit functionality
+#include <time.h>					// for time functionality
 
 #include <vector>					// for vector
 #include <sstream>
@@ -55,12 +46,11 @@ glm::vec3 eyePoint(   0.0f, 0.0f, 0.0f );
 glm::vec3 lookAtPoint( 0.0f,  0.0f,  0.0f );
 glm::vec3 upVector(    0.0f,  1.0f,  0.0f );
 
-bool freeCamOn = false;
+bool firstPersonCamOn = false;
+glm::vec3 firstPersonCamPos(0.0f, 0.0f, 0.0f);
+glm::vec3 firstPersonCamLookAt(0.0f, 0.0f, 0.0f);
 
-glm::vec2 freeCamAngles( -1.57f, 2.01f);
-glm::vec3 freeCamPos(   0.0f, 0.0f, 0.0f );
-glm::vec3 freeCamDir( 0.0f,  0.0f,  0.0f );
-glm::vec3 freeCamLookAt( 0.0f,  0.0f,  0.0f );
+float HEIGHT_OFFSET = 3.0f;
 
 string groundStr = "models/ground.obj";
 string treesStr = "models/trees.obj";
@@ -177,36 +167,21 @@ bool moving = false;
 //
 ////////////////////////////////////////////////////////////////////////////////
 void updateCamera() {
-	if(freeCamOn){
-		float r = sinf(freeCamAngles.y);
-		freeCamDir = glm::vec3(1*r*sinf(freeCamAngles.x), -1*cosf(freeCamAngles.y), -1*r*cosf(freeCamAngles.x));
-
-		freeCamDir = normalize(freeCamDir);
-		freeCamLookAt = freeCamPos+freeCamDir;
+	if(firstPersonCamOn){
+		firstPersonCamPos = playerPos + playerDir;	// camera is located at current player's position offset to be in front of rendered part
+		firstPersonCamPos.y += HEIGHT_OFFSET;
+		// calculate first person cam look at point based on cameraAngles
+		firstPersonCamLookAt.x = sinf( cameraAngles.x ) * -sinf( cameraAngles.y );
+		firstPersonCamLookAt.y = cosf( cameraAngles.y );
+		firstPersonCamLookAt.z = -cosf( cameraAngles.x ) * -sinf( cameraAngles.y );
+		firstPersonCamLookAt += firstPersonCamPos;
 	}else{
 		eyePoint.x = cameraAngles.z * sinf( cameraAngles.x ) * sinf( cameraAngles.y );
 		eyePoint.y = cameraAngles.z * -cosf( cameraAngles.y );
 		eyePoint.z = cameraAngles.z * -cosf( cameraAngles.x ) * sinf( cameraAngles.y );
-		eyePoint+=playerPos;
+		eyePoint += playerPos;
 		lookAtPoint = playerPos;
 	}
-}
-
-
-void updateFreeCamera(){
-	if(moveUp){
-		freeCamPos += normalize(freeCamDir)*2.0f;
-	}
-	if(moveDown){
-		freeCamPos -= normalize(freeCamDir)*2.0f;
-	}
-	if(moveRight){
-		//freeCamPos += normalize(cross(normalize(freeCamDir), upVector))*2.0f;
-	}
-	if(moveLeft){
-		//freeCamPos -= normalize(cross(normalize(freeCamDir), upVector))*2.0f;
-	}
-	updateCamera();
 }
 
 
@@ -255,8 +230,18 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 
 	if( (key == '1') && action == GLFW_PRESS ){
-		freeCamOn = ! freeCamOn;
+		firstPersonCamOn = ! firstPersonCamOn;
 		moveUp = moveDown = moveRight = moveLeft = false;
+		
+		if(cameraAngles.y < 0 && firstPersonCamOn) 
+		{
+			cameraAngles.y = 0.0f + 0.001f;
+		}
+		else if(cameraAngles.y < M_PI/2.0 && !firstPersonCamOn)
+		{
+			cameraAngles.y = M_PI/2.0 + 0.001f;
+		}
+		
 		updateCamera();
 	}
 
@@ -336,27 +321,26 @@ static void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
 					mousePosition.x = xpos;
 					mousePosition.y = ypos;
 				} else {
-					if(freeCamOn){
-						freeCamAngles.x += (xpos - mousePosition.x)*0.005f;
-						freeCamAngles.y -= (ypos - mousePosition.y)*0.005f;
+					if( !controlDown ) {
+						cameraAngles.x += (xpos - mousePosition.x)*0.005f;
+						cameraAngles.y += (ypos - mousePosition.y)*0.005f;
 
-						if( freeCamAngles.y < 0 ) freeCamAngles.y = 0.0f + 0.001f;
-						if( freeCamAngles.y >= M_PI ) freeCamAngles.y = M_PI - 0.001f;
-					}else{
-						if( !controlDown ) {
-							cameraAngles.x += (xpos - mousePosition.x)*0.005f;
-							cameraAngles.y += (ypos - mousePosition.y)*0.005f;
-
-							if( cameraAngles.y < 0 ) cameraAngles.y = 0.0f + 0.001f;
-							if( cameraAngles.y >= M_PI ) cameraAngles.y = M_PI - 0.001f;
-						} else {
-							double totChgSq = (xpos - mousePosition.x) + (ypos - mousePosition.y);
-							cameraAngles.z += totChgSq*0.02f;
-
-							if( cameraAngles.z <= 2.0f ) cameraAngles.z = 2.0f;
-							if( cameraAngles.z >= 500.0f ) cameraAngles.z = 500.0f;
+						if(cameraAngles.y < 0 && firstPersonCamOn) 
+						{
+							cameraAngles.y = 0.0f + 0.001f;
 						}
-					}					
+						else if(cameraAngles.y < M_PI/2.0 && !firstPersonCamOn)
+						{
+							cameraAngles.y = M_PI/2.0 + 0.001f;
+						}
+						if( cameraAngles.y >= M_PI ) cameraAngles.y = M_PI - 0.001f;
+					} else {
+						double totChgSq = (xpos - mousePosition.x) + (ypos - mousePosition.y);
+						cameraAngles.z += totChgSq*0.02f;
+
+						if( cameraAngles.z <= 2.0f ) cameraAngles.z = 2.0f;
+						if( cameraAngles.z >= 500.0f ) cameraAngles.z = 500.0f;
+					}
 					updateCamera();
 
 					mousePosition.x = xpos;
@@ -417,7 +401,7 @@ GLFWwindow* setupGLFW() {
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );		// request OpenGL 3.3 context
 
 	// create a window for a given size, with a given title
-	GLFWwindow *window = glfwCreateWindow(640, 480, "Lab11: Collision Detection", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(640, 480, "FP: ", NULL, NULL);
 	if( !window ) {						// if the window could not be created, NULL is returned
 		fprintf( stderr, "[ERROR]: GLFW Window could not be created\n" );
 		glfwTerminate();
@@ -540,7 +524,7 @@ void setupBuffers() {
 	moonModel= new CSCI441::ModelLoader();
   	moonModel->loadModelFile( moonModelFile );
 
-	/*for(int i = 1; i <= WALKING_FRAME_COUNT; ++i)
+	for(int i = 1; i <= WALKING_FRAME_COUNT; ++i)
 	{
 		std::stringstream ss;
 		ss << i;
@@ -548,9 +532,8 @@ void setupBuffers() {
 		
 		greenmarioModelFrames.push_back(new CSCI441::ModelLoader());
 		greenmarioModelfile = (greenmarioFilenameTemplate + frameNumber + ".obj").c_str();
-		//cout << greenmarioModelfile << endl;
 		greenmarioModelFrames.back()->loadModelFile(greenmarioModelfile);
-	}*/
+	}
 }
 
 
@@ -578,7 +561,6 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	glUniform3fv(textureShaderUniforms.lightPos, 1, &lightPos[0]);
 	glUniform3fv(textureShaderUniforms.lightDir, 1, &playerDir[0]);
 	
-	
 	glUniform1ui(textureShaderUniforms.tex, GL_TEXTURE0);
 	glUniform4fv(textureShaderUniforms.color, 1, &white[0]);
 	
@@ -586,12 +568,14 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	playerMtx = glm::rotate( playerMtx, -cameraAngles.x, upVector );
 	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &playerMtx[0][0]);
 	
-	greenMarioModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
-	
-	
-
-	
-
+	if(moving)
+	{
+		greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	}
+	else
+	{
+		greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	}	
 	
 	if(paused){
 		customShaderProgram->useProgram();
@@ -612,7 +596,6 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 		treesModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
 		wallsModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
 		fencesModel->draw( customShaderAttributes.vPos, -1,  customShaderAttributes.vTextureCoord);
-		
 	}else{
 		glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &modelMatrix[0][0]);
 		
@@ -624,15 +607,6 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 		wallsModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 		fencesModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	}
-	
-	//if(moving)
-	//{
-	//	greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	//}
-	//else
-	//{
-	//	greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
-	//}	
 }
 
 
@@ -640,8 +614,15 @@ void updatePlayer() {
 	//cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
 	if(!paused)
 	{
-		// get the sum of the directional inputs from the player
-		playerDir = lookAtPoint-eyePoint;
+		if(firstPersonCamOn)
+		{
+			playerDir = firstPersonCamLookAt - firstPersonCamPos;
+		}
+		else
+		{
+			// get the sum of the directional inputs from the player
+			playerDir = lookAtPoint-eyePoint;
+		}
 		playerDir.y = 0.0;
 		playerDir = normalize(playerDir);
 		
@@ -775,10 +756,10 @@ int main( int argc, char *argv[] ) {
 		glm::mat4 projectionMatrix = glm::perspective( 45.0f, windowWidth / (float) windowHeight, 0.001f, 1000.0f );
 
 		// set up our look at matrix to position our camera
-		glm::mat4 viewMatrix = glm::lookAt( eyePoint,lookAtPoint, upVector );
+		glm::mat4 viewMatrix = glm::lookAt(eyePoint, lookAtPoint, upVector);
 
-		if(freeCamOn){
-			viewMatrix = glm::lookAt( freeCamPos, freeCamLookAt, upVector );
+		if(firstPersonCamOn){
+			viewMatrix = glm::lookAt(firstPersonCamPos, firstPersonCamLookAt, upVector);
 		}
 
 		// draw everything to the window
@@ -788,16 +769,8 @@ int main( int argc, char *argv[] ) {
 		glfwSwapBuffers(window);		// flush the OpenGL commands and make sure they get rendered!
 		glfwPollEvents();				// check for any events and signal to redraw screen
 
-		if(!freeCamOn)
-		{
-			updatePlayer();
-		}	
+		updatePlayer();
 		updateCamera();
-		
-		if(freeCamOn)
-		{
-			updateFreeCamera();
-		}	
 	}
 
 	glfwDestroyWindow( window );// clean up and close our window
