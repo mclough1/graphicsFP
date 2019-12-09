@@ -29,6 +29,8 @@
 #include <stdlib.h>				// for exit functionality
 #include <time.h>				// for time functionality
 
+#include <sstream>
+
 #include <vector>					// for vector
 
 #include <CSCI441/modelLoader3.hpp> // to load in OBJ models
@@ -72,6 +74,12 @@ const char* greenMarioModelFile = greenMarioStr.c_str();
 CSCI441::ModelLoader* mansionModel = NULL;
 CSCI441::ModelLoader* skyboxModel = NULL;
 CSCI441::ModelLoader* greenMarioModel = NULL;
+
+const char* greenmarioModelfile = NULL;
+vector<CSCI441::ModelLoader*> greenmarioModelFrames;
+string greenmarioFilenameTemplate = "models/greenmario_";
+int WALKING_FRAME_COUNT = 41;
+int currentFrame = 0;
 
 //two shaders, one texture shader for the platform and skybox, and a custom one for everything else
 CSCI441::ShaderProgram* textureShaderProgram = NULL;
@@ -485,7 +493,17 @@ void setupBuffers() {
 	greenMarioModel = new CSCI441::ModelLoader();
   	greenMarioModel->loadModelFile( greenMarioModelFile );
 
-
+	for(int i = 1; i <= WALKING_FRAME_COUNT; ++i)
+	{
+		std::stringstream ss;
+		ss << i;
+		string frameNumber = ss.str();
+		
+		greenmarioModelFrames.push_back(new CSCI441::ModelLoader());
+		greenmarioModelfile = (greenmarioFilenameTemplate + frameNumber + ".obj").c_str();
+		//cout << greenmarioModelfile << endl;
+		greenmarioModelFrames.back()->loadModelFile(greenmarioModelfile);
+	}
 
 
 }
@@ -534,6 +552,13 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	playerMtx = glm::rotate( playerMtx, -cameraAngles.x, upVector );
 	glUniformMatrix4fv(textureShaderUniforms.modelMtx, 1, GL_FALSE, &playerMtx[0][0]);
 	greenMarioModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	
+	greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	currentFrame++;
+	if(currentFrame >= WALKING_FRAME_COUNT)
+	{
+		currentFrame = 0;
+	}
 	
 }
 
