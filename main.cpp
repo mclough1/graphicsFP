@@ -554,7 +554,7 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 
 
 void updatePlayer() {
-	cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
+	//cout << "(" << playerPos.x << "," << playerPos.y << "," << playerPos.z << ")" << endl;
 	
 	// get the sum of the directional inputs from the player
 	playerDir = lookAtPoint-eyePoint;
