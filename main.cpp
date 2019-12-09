@@ -29,6 +29,8 @@
 #include <stdlib.h>				// for exit functionality
 #include <time.h>				// for time functionality
 
+#include <sstream>
+
 #include <vector>					// for vector
 
 #include <CSCI441/modelLoader3.hpp> // to load in OBJ models
@@ -68,6 +70,12 @@ const char* mansionModelfile = mansionStr.c_str();
 const char* skyboxModelfile = skyboxStr.c_str();
 CSCI441::ModelLoader* mansionModel = NULL;
 CSCI441::ModelLoader* skyboxModel = NULL;
+
+const char* greenmarioModelfile = NULL;
+vector<CSCI441::ModelLoader*> greenmarioModelFrames;
+string greenmarioFilenameTemplate = "models/greenmario_";
+int WALKING_FRAME_COUNT = 41;
+int currentFrame = 0;
 
 //two shaders, one texture shader for the platform and skybox, and a custom one for everything else
 CSCI441::ShaderProgram* textureShaderProgram = NULL;
@@ -478,15 +486,22 @@ void setupBuffers() {
 	// Models
 
 	mansionModel = new CSCI441::ModelLoader();
-	//model->enableAutoGenerateNormals();
-  	mansionModel->loadModelFile( mansionModelfile );
+  	mansionModel->loadModelFile(mansionModelfile);
 	skyboxModel = new CSCI441::ModelLoader();
-	//model->enableAutoGenerateNormals();
-  	skyboxModel->loadModelFile( skyboxModelfile );
-
-
-
-
+  	skyboxModel->loadModelFile(skyboxModelfile);
+	
+	for(int i = 1; i <= WALKING_FRAME_COUNT; ++i)
+	{
+		std::stringstream ss;
+		ss << i;
+		string frameNumber = ss.str();
+		
+		greenmarioModelFrames.push_back(new CSCI441::ModelLoader());
+		greenmarioModelfile = (greenmarioFilenameTemplate + frameNumber + ".obj").c_str();
+		//cout << greenmarioModelfile << endl;
+		greenmarioModelFrames.back()->loadModelFile(greenmarioModelfile);
+	}
+	
 }
 
 void populateEnemies() {
@@ -528,6 +543,14 @@ void renderScene( glm::mat4 viewMatrix, glm::mat4 projectionMatrix ) {
 	glUniform4fv(textureShaderUniforms.color, 1, &white[0]);
 	mansionModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
 	skyboxModel->draw( textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	
+	greenmarioModelFrames[currentFrame]->draw(textureShaderAttributes.vPos, -1,  textureShaderAttributes.vTextureCoord);
+	currentFrame++;
+	if(currentFrame >= WALKING_FRAME_COUNT)
+	{
+		currentFrame = 0;
+	}
+	//cout << currentFrame << endl;
 	
 }
 
