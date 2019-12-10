@@ -1,5 +1,27 @@
 # Blender MTL File: 'None'
-# Material Count: 2
+# Material Count: 4
+
+newmtl Material
+Ns 323.999994
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl material_13.001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.780392 0.780392 0.780392
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 1
+map_Kd Textures\\reri1.png
+map_d Textures\\reri1.png
 
 newmtl material_22.001
 Ns 0.000000
@@ -10,8 +32,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd models\Textures\isigaki.png
-map_d models\Textures\isigaki.png
+map_Kd Textures\\isigaki.png
+map_d Textures\\isigaki.png
 
 newmtl material_25.001
 Ns 0.000000
@@ -22,5 +44,5 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 1
-map_Kd models\Textures\haka.png
-map_d models\Textures\haka.png
+map_Kd Textures\\haka.png
+map_d Textures\\haka.png
