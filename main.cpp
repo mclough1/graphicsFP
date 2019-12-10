@@ -231,7 +231,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 	if( (key == '1') && action == GLFW_PRESS ){
 		firstPersonCamOn = ! firstPersonCamOn;
-		moveUp = moveDown = moveRight = moveLeft = false;
+		//moveUp = moveDown = moveRight = moveLeft = false;
 		
 		if(cameraAngles.y < 0 && firstPersonCamOn) 
 		{
